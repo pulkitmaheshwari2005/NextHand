@@ -523,7 +523,7 @@
     if (S.tab === 'queue') {
       var cur = S.sel ? byId(S.sel) : null;
       var selId = cur && (visible(cur) || (cur.status === 'closed' && cur.owner === S.role)) ? S.sel : (first ? first.id : tasks[0] ? tasks[0].id : partner[0] ? partner[0].id : null);
-      var list = (first ? hero(first) : '') + (offers.length > 1 ? section('Also waiting', offers.slice(1), 'offer', '', 2) : '') +
+      var list = (first ? hero(first, selId) : '') + (offers.length > 1 ? section('Also waiting', offers.slice(1), 'offer', '', 2) : '') +
         (!first ? '<p class="empty big">' + (isProbation(a) ? 'No Delayed cases right now. Higher-severity cases go to verified responders.' : 'Nothing is waiting for a decision. New cases appear here the moment a call is ranked.') + '</p>' : '') +
         section('Your tasks', tasks, 'task') + section('With partner responders', partner, 'partner');
       body = '<div class="split"><div class="list">' + list + '</div><div class="detail">' + (selId ? caseDetail(byId(selId)) : '<p class="empty pad">Pick a case to see where it stands.</p>') + '</div></div>';
@@ -593,9 +593,9 @@
     return '<h3 class="sec">' + esc(title) + ' <i>' + list.length + '</i></h3>' +
       (list.length ? '<ol class="rows">' + list.map(function (c, i) { return row(c, mode, startRank ? startRank + i : 0); }).join('') + '</ol>' : '<p class="empty">' + esc(empty) + '</p>');
   }
-  function hero(c) {
+  function hero(c, selId) {
     var m = matchUnit(c);
-    return '<section class="hero h-' + c.band + '" aria-label="Next case to decide"><div class="hero-top"><span class="band hb">' + BAND[c.band] + '</span><span class="lbl">Decide now</span></div>' +
+    return '<section class="hero h-' + c.band + (selId === c.id ? ' sel' : '') + '" data-a="open" data-id="' + c.id + '" tabindex="0" role="button" aria-label="Open the case: ' + esc(c.title) + '"><div class="hero-top"><span class="band hb">' + BAND[c.band] + '</span><span class="lbl">Decide now</span></div>' +
       '<h2>' + esc(c.title) + '</h2><p class="risk">' + esc(riskLine(c)) + '</p>' +
       '<div class="hero-row"><div class="timer"><small>Time left to respond</small><b data-cd="' + c.offerExp + '">' + dur(c.offerExp - S.t) + '</b></div>' +
       '<div class="hero-btns"><button class="hb-go" data-a="accept" data-id="' + c.id + '">Accept</button><button class="hb-no" data-a="decline" data-id="' + c.id + '">Decline</button></div></div>' +
@@ -820,7 +820,10 @@
     if (f === 'declnote') { var g = $('#declgo'); if (g) g.disabled = !declineReady(ui.modal); }
     if (f === 'rqtext') { var q = $('#rqgo'); if (q) q.disabled = t.value.trim().length < 10; }
   });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && ui.modal) { ui.modal = null; render(); } });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && ui.modal) { ui.modal = null; render(); }
+    else if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('hero')) { e.preventDefault(); e.target.click(); }
+  });
 
   /* ---------- clock ---------- */
   function tick() {

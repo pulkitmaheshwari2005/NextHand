@@ -122,6 +122,9 @@ ol, ul { margin: 0; }
 /* the decide-now card */
 .hero { border-radius: 14px; padding: 16px 18px 14px; margin-bottom: 14px; color: #fff; box-shadow: 0 8px 18px -10px rgba(15, 27, 77, .6); }
 .h-immediate { background: var(--imm); } .h-urgent { background: var(--urg); color: var(--urg-ink); } .h-delayed { background: var(--del); }
+.hero { cursor: pointer; transition: box-shadow .15s; }
+.hero:hover { box-shadow: 0 10px 22px -10px rgba(15, 27, 77, .75); }
+.hero.sel { outline: 4px solid var(--yel); outline-offset: 3px; }
 .hero-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 .hero .hb { background: #fff; color: var(--ink); font-size: 15px; }
 .hero .lbl { font: 600 15px var(--sign); opacity: .95; }
