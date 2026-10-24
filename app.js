@@ -86,7 +86,7 @@
     var s = {
       v: 6, t: D.start, strikes: {}, running: true, role: 'officer', net: true, tab: 'queue', sel: null,
       seq: 410, cases: [], units: [], hist: clone(D.history), done: { ngo: 0, ngo2: 0 },
-      requests: [], reqSeq: 0, pool: 0, walk: { open: true, done: {} }
+      requests: [], reqSeq: 0, pool: 0, walk: { open: window.innerWidth > 640, done: {} }
     };
     D.cases.forEach(function (c) { s.cases.push(mkCase(c, s)); });
     var u = mkCase(D.unclear, s);
@@ -97,7 +97,7 @@
     return s;
   }
   function load() {
-    try { var v = JSON.parse(localStorage.getItem(KEY)); if (v && v.v === 6) return v; } catch (e) { /* private mode */ }
+    try { var v = JSON.parse(localStorage.getItem(KEY)); if (v && v.v === 6) { if (v.walk && !v.walk.touched && window.innerWidth <= 640) v.walk.open = false; return v; } } catch (e) { /* private mode */ }
     return fresh();
   }
   var S = load();
@@ -782,7 +782,7 @@
       case 'ff': advance(S.t + Number(b.getAttribute('data-s'))); toast('Clock moved forward to ' + hm(S.t) + '.'); break;
       case 'net': S.net = !S.net; toast(S.net ? 'Network is back.' : 'Network is down: offers now go by SMS.', S.net ? 'good' : 'warn'); break;
       case 'reset': S = fresh(); ui.modal = null; ui.toasts = []; window.scrollTo(0, 0); toast('Demo reset. Everything is back to the start.', 'good'); break;
-      case 'walk': S.walk.open = !S.walk.open; break;
+      case 'walk': S.walk.open = !S.walk.open; S.walk.touched = true; break;
       case 'tab': S.tab = b.getAttribute('data-tab'); S.sel = null; break;
       case 'openq': S.tab = 'queue'; S.sel = id; break;
       case 'open': S.sel = id; if (window.matchMedia('(max-width: 900px)').matches) setTimeout(function () { var d = document.querySelector('.detail'); if (d) d.scrollIntoView({ behavior: 'smooth' }); }, 0); break;

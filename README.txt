@@ -3,6 +3,7 @@ NextHand prototype (Flipkart APM '29, Prompt 2). Pulkit Maheshwari, BITS Pilani.
 HOW TO RUN
 Unzip, then double-click index.html (Chrome, Edge or Firefox). No install and no internet needed.
 Plain HTML, CSS and JavaScript. Nothing is sent anywhere; state is kept in your browser.
+Works on a laptop and on a phone (on a phone the left rail becomes the header, and "Reset demo" sits under "Demo controls").
 "Reset demo" (bottom of the left rail) puts everything back to the start.
 
 WHAT THIS IS
