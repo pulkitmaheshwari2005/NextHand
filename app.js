@@ -634,12 +634,12 @@
   }
   function mapBlock(c) {
     var arrived = c.step >= 3 || c.status === 'awaiting', ux = arrived ? 210 : 40, uy = arrived ? 40 : 118;
-    return '<section class="map"><h4>Route to the caller</h4><svg viewBox="0 0 320 140" role="img" aria-label="Map with the unit, the route and the caller’s pin"><rect width="320" height="140" fill="#E6ECFF"/>' +
-      '<path d="M0 100H320M0 40H320M80 0V140M210 0V140M0 70H320" stroke="#fff" stroke-width="9" fill="none"/><path d="M0 100H320M0 40H320M80 0V140M210 0V140M0 70H320" stroke="#C3CCEA" stroke-width="1" fill="none"/>' +
-      '<polyline points="40,118 80,100 80,40 210,40" fill="none" stroke="#1E4BDB" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>' +
-      '<circle cx="' + ux + '" cy="' + uy + '" r="8" fill="#118542" stroke="#fff" stroke-width="3"/><text x="' + (arrived ? 222 : 52) + '" y="' + (arrived ? 62 : 128) + '" font-size="11" font-weight="700" fill="#0F1B4D">' + (arrived ? 'Unit on site' : 'Unit') + '</text>' +
+    return '<section class="map"><h4>Route to the caller</h4><svg viewBox="0 0 320 140" role="img" aria-label="Map with the unit, the route and the caller’s pin"><rect class="mp-bg" width="320" height="140" fill="#E6ECFF"/>' +
+      '<path class="mp-road" d="M0 100H320M0 40H320M80 0V140M210 0V140M0 70H320" stroke="#fff" stroke-width="9" fill="none"/><path class="mp-line" d="M0 100H320M0 40H320M80 0V140M210 0V140M0 70H320" stroke="#C3CCEA" stroke-width="1" fill="none"/>' +
+      '<polyline class="mp-route" points="40,118 80,100 80,40 210,40" fill="none" stroke="#1E4BDB" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>' +
+      '<circle class="mp-unit" cx="' + ux + '" cy="' + uy + '" r="8" fill="#118542" stroke="#fff" stroke-width="3"/><text class="mp-t" x="' + (arrived ? 222 : 52) + '" y="' + (arrived ? 62 : 128) + '" font-size="11" font-weight="700" fill="#0F1B4D">' + (arrived ? 'Unit on site' : 'Unit') + '</text>' +
       '<path d="M210 40 l-9 -14 a11 11 0 1 1 18 0 z" fill="#D92D20" stroke="#fff" stroke-width="2"/><circle cx="210" cy="22" r="4" fill="#fff"/>' +
-      '<text x="228" y="22" font-size="11" font-weight="700" fill="#0F1B4D">Caller</text></svg>' +
+      '<text class="mp-t" x="228" y="22" font-size="11" font-weight="700" fill="#0F1B4D">Caller</text></svg>' +
       '<p class="sm">' + c.km + ' km · ' + esc(c.exact) + '</p></section>';
   }
   function caseDetail(c) {
