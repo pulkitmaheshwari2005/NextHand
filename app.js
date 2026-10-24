@@ -5,7 +5,7 @@
 (function () {
   'use strict';
   var D = window.NHDATA;
-  var KEY = 'nexthand_v5';
+  var KEY = 'nexthand_v6';
   var MIN = 60, H = 3600;
   var BANDS = ['immediate', 'urgent', 'delayed'];
   var BAND = { immediate: 'Immediate', urgent: 'Urgent', delayed: 'Delayed' };
@@ -56,8 +56,8 @@
 
   /* ---------- state ---------- */
   function bandOf(h) { return h < 6 ? 'immediate' : h <= 24 ? 'urgent' : 'delayed'; }
-  function addEv(c, t, text) { c.events.push({ t: t, text: text }); }
-  function ev(c, text) { addEv(c, S.t, text); }
+  function addEv(c, t, text, sens) { var e = { t: t, text: text }; if (sens) e.sens = true; c.events.push(e); }
+  function ev(c, text, sens) { addEv(c, S.t, text, sens); }
 
   function mkCase(tpl, s) {
     var c = clone(tpl);
@@ -75,8 +75,8 @@
     c.checked = null; c.goAnyway = false; c.repeats = 0; c.closedWhy = '';
     c.events = [];
     addEv(c, c.created, 'Call received in ' + c.lang + '. The caller pressed: ' + ansSummary(c) + '.');
-    addEv(c, c.created + 10, c.loc === 'pin' ? 'Location from the caller: PIN ' + c.pin + ' and the landmark “' + c.landmark + '”.' : 'Location taken from the phone network.');
-    if (c.name !== 'Not left') addEv(c, c.created + 20, 'Voice message recorded. ' + c.name + ' left a name and a landmark.');
+    addEv(c, c.created + 10, c.loc === 'pin' ? 'Location from the caller: a PIN code and a landmark.' : 'Location taken from the phone network.');
+    if (c.name !== 'Not left') addEv(c, c.created + 20, 'Voice message recorded; a name and a landmark were left.');
     if (c.callers > 1) addEv(c, c.created + 30, c.callers + ' calls about the same place merged into one case.');
     addEv(c, c.created + 60, 'Ranked ' + BAND[c.band] + ' by the keypad rule.');
     addEv(c, c.created + 60, 'Offered to the ' + c.tier + ' tier.');
@@ -84,7 +84,7 @@
   }
   function fresh() {
     var s = {
-      v: 5, t: D.start, strikes: {}, running: true, role: 'officer', net: true, tab: 'queue', sel: null,
+      v: 6, t: D.start, strikes: {}, running: true, role: 'officer', net: true, tab: 'queue', sel: null,
       seq: 410, cases: [], units: [], hist: clone(D.history), done: { ngo: 0, ngo2: 0 },
       requests: [], reqSeq: 0, pool: 0, walk: { open: true, done: {} }
     };
@@ -97,7 +97,7 @@
     return s;
   }
   function load() {
-    try { var v = JSON.parse(localStorage.getItem(KEY)); if (v && v.v === 5) return v; } catch (e) { /* private mode */ }
+    try { var v = JSON.parse(localStorage.getItem(KEY)); if (v && v.v === 6) return v; } catch (e) { /* private mode */ }
     return fresh();
   }
   var S = load();
@@ -257,7 +257,7 @@
         c.cbMissed = 0;
         if (c.band !== 'delayed' && !c.goAnyway) {
           c.goAnyway = true; ui.flash = c.id;
-          ev(c, 'Caller unreachable twice. The unit goes anyway and asks locally for ' + c.name + ' near “' + c.landmark + '”.');
+          ev(c, 'Caller unreachable twice. The unit goes anyway and asks locally for ' + c.name + ' near “' + c.landmark + '”.', true);
           toast('Caller not reachable for ' + c.title + '. The unit goes anyway and asks locally.', 'warn');
         }
       }
@@ -343,19 +343,20 @@
   }
   function verify(id, o, place) {
     var c = byId(id); if (!c || c.status !== 'active' || c.checked) return;
-    if (place && place !== c.exact) { ev(c, 'Exact place corrected on the call: ' + place + '.'); c.exact = place; }
+    if (place && place !== c.exact) { ev(c, 'Exact place corrected on the call: ' + place + '.', true); c.exact = place; }
     var who = 'Responder phoned ' + c.name + ' (' + c.contact + '): ';
-    if (o === 'confirmed') { c.checked = 'Confirmed'; c.unconfirmed = false; ev(c, who + 'confirmed what was reported.'); toast('Recorded: confirmed.', 'good'); }
-    else if (o === 'up') { c.checked = 'Worse than reported'; c.unconfirmed = false; ev(c, who + 'it is worse than reported.'); worsen(c, 'Band raised after the responder call'); toast('Recorded: worse than reported. The band went up.', 'warn'); }
+    var SENS = true;
+    if (o === 'confirmed') { c.checked = 'Confirmed'; c.unconfirmed = false; ev(c, who + 'confirmed what was reported.', true); toast('Recorded: confirmed.', 'good'); }
+    else if (o === 'up') { c.checked = 'Worse than reported'; c.unconfirmed = false; ev(c, who + 'it is worse than reported.', true); worsen(c, 'Band raised after the responder call'); toast('Recorded: worse than reported. The band went up.', 'warn'); }
     else if (o === 'down') {
       c.checked = 'Less serious'; c.unconfirmed = false; var i = BANDS.indexOf(c.band);
-      if (i < 2) { var old = c.band; c.band = BANDS[i + 1]; ev(c, who + 'less serious than reported. Lowered from ' + BAND[old] + ' to ' + BAND[c.band] + '.'); }
-      else ev(c, who + 'less serious than reported. Already Delayed.');
+      if (i < 2) { var old = c.band; c.band = BANDS[i + 1]; ev(c, who + 'less serious than reported. Lowered from ' + BAND[old] + ' to ' + BAND[c.band] + '.', true); }
+      else ev(c, who + 'less serious than reported. Already Delayed.', true);
       toast('Recorded: less serious than reported.', 'good');
     } else {
       c.checked = 'Not genuine'; c.closedWhy = 'the responder found the report was not genuine';
       S.strikes[c.contact] = (S.strikes[c.contact] || 0) + 1;
-      ev(c, who + 'not genuine. A strike is recorded against ' + c.contact + '.');
+      ev(c, who + 'not genuine. A strike is recorded against ' + c.contact + '.', true);
       S.hist.trips++; S.hist.wasted++; closeCase(c, false);
       toast('Marked not genuine. The case is closed and the number has a strike.', 'warn');
     }
@@ -537,7 +538,20 @@
     } else {
       body = unitsView(myUnits());
     }
-    $('#main').innerHTML = walkBar() + greet + (S.role === 'officer' ? officerTiles() : ngoTiles(a, tasks, pend)) + banner + tabsBar(tabsList) + body;
+    $('#main').innerHTML = walkBar() + greet + banner + '<div class="work"><div class="col-main">' + tabsBar(tabsList) + body + '</div><aside class="col-side" aria-label="Figures and latest activity">' + (S.role === 'officer' ? officerTiles() : ngoTiles(a, tasks, pend)) + feedHtml() + '</aside></div>';
+  }
+  function feedHtml() {
+    var cs = S.role === 'officer' ? S.cases : S.cases.filter(function (c) { return visible(c) || c.owner === S.role; });
+    var items = [], n = 0;
+    cs.forEach(function (c) {
+      var pub = c.events.filter(function (e) { return !e.sens; });
+      if (pub.length) items.push({ c: c, e: pub[pub.length - 1], n: n++ });
+    });
+    items.sort(function (a, b) { return b.e.t - a.e.t || b.n - a.n; });
+    items = items.slice(0, 8);
+    return '<section class="feed"><h3 class="sec">Latest activity</h3><ol>' + (items.length ? items.map(function (x) {
+      return '<li class="r-' + x.c.band + '"><button data-a="openq" data-id="' + x.c.id + '"><time>' + hm(x.e.t) + '</time><b>' + esc(x.c.title) + '</b><span>' + esc(x.e.text) + '</span></button></li>';
+    }).join('') : '<li class="none">Nothing yet. Activity on your cases shows up here.</li>') + '</ol></section>';
   }
   function greetText(a, offers, tasks, pend) {
     if (S.role === 'officer') {
@@ -658,7 +672,7 @@
       '<dt>Reports</dt><dd>' + c.callers + (c.callers > 1 ? ' calls merged into one case' : ' call') + (c.unconfirmed ? ', not yet confirmed by a second source' : '') + '</dd>' +
       '<dt>Suggested kit</dt><dd>' + esc(c.needs.join(', ')) + '</dd></dl>' + voiceBlock(c) + zone + (onRoute ? mapBlock(c) : '') +
       '<section class="why"><h4>Why it is ranked ' + BAND[c.band] + '</h4><p>' + esc(whyText(c)) + '</p></section>' + chk +
-      '<details class="log"><summary>Audit trail (' + c.events.length + ')</summary><ul>' + c.events.slice().reverse().map(function (e) { return '<li><time>' + hm(e.t) + '</time><span>' + esc(e.text) + '</span></li>'; }).join('') + '</ul></details></article>';
+      '<details class="log"><summary>Audit trail (' + c.events.filter(function (e) { return see || !e.sens; }).length + ')</summary><ul>' + c.events.filter(function (e) { return see || !e.sens; }).reverse().map(function (e) { return '<li><time>' + hm(e.t) + '</time><span>' + esc(e.text) + '</span></li>'; }).join('') + '</ul></details></article>';
   }
   function reviewDetail(c) {
     return '<article class="case"><div class="case-h"><span class="band b-urgent">Urgent for now</span><span class="id">' + esc(c.id) + '</span></div>' +
@@ -687,7 +701,7 @@
       var c = byId(r.caseId);
       return '<li class="hist"><span class="chip2 s-' + r.status + '">' + { approved: 'Approved', declined: 'Declined', expired: 'Closed', withdrawn: 'Withdrawn' }[r.status] + '</span><span><b>' + esc(acct(r.role).short) + '</b> for ' + esc(c.title) + (r.note ? '<br><span class="sm">' + esc(r.note) + '</span>' : '') + '</span></li>';
     }).join('') + '</ol>' : '';
-    return '<div class="reqwrap"><h3 class="sec">Waiting for your decision <i>' + pend.length + '</i></h3>' + cards + hist + '</div>';
+    return '<div class="reqwrap"><h3 class="sec">Waiting for your decision <i>' + pend.length + '</i></h3><div class="rows">' + cards + '</div>' + hist + '</div>';
   }
   function higherView(a) {
     if (isProbation(a)) {
@@ -767,6 +781,7 @@
       case 'reset': S = fresh(); ui.modal = null; ui.toasts = []; window.scrollTo(0, 0); toast('Demo reset. Everything is back to the start.', 'good'); break;
       case 'walk': S.walk.open = !S.walk.open; break;
       case 'tab': S.tab = b.getAttribute('data-tab'); S.sel = null; break;
+      case 'openq': S.tab = 'queue'; S.sel = id; break;
       case 'open': S.sel = id; if (window.matchMedia('(max-width: 900px)').matches) setTimeout(function () { var d = document.querySelector('.detail'); if (d) d.scrollIntoView({ behavior: 'smooth' }); }, 0); break;
       case 'accept': accept(id); break;
       case 'decline': ui.modal = { kind: 'decline', id: id, reason: null, text: '', focus: true }; break;
