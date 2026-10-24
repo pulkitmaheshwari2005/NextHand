@@ -72,7 +72,7 @@
     c.offerExp = s.t + (tpl.offerLeftMins != null ? tpl.offerLeftMins : D.offerMins[c.band]) * MIN;
     c.callbackAt = s.t + (tpl.callbackAfter || D.callbackMins) * MIN;
     c.cbMissed = 0; c.cbIdx = 0; c.step = 0; c.unit = null; c.owner = null; c.expert = false; c.helpedAt = null; c.awaitSince = null; c.left = [];
-    c.checked = null; c.goAnyway = false; c.repeats = 0; c.closedWhy = '';
+    c.checked = null; c.calledAt = null; c.goAnyway = false; c.repeats = 0; c.closedWhy = '';
     c.events = [];
     addEv(c, c.created, 'Call received in ' + c.lang + '. The caller pressed: ' + ansSummary(c) + '.');
     addEv(c, c.created + 10, c.loc === 'pin' ? 'Location from the caller: a PIN code and a landmark.' : 'Location taken from the phone network.');
@@ -625,7 +625,9 @@
       (open ? '<p class="vt"><span class="sm">Demo only: what the recording says</span><br>“' + esc(c.voice) + '”</p>' : '') + '</div></section>';
   }
   function verifyPanel(c) {
+    var who = c.name === 'Not left' ? 'the caller' : c.name, phone = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.6a1 1 0 0 1-.25 1z"/></svg>';
     return '<div class="zone verify"><p><b>Call the caller.</b> Check what they pressed and the exact place. ' + (c.band === 'immediate' ? 'For Immediate cases the unit can move first and you call on the way.' : 'Record what you hear.') + '</p>' +
+      '<div class="callrow"><button class="btn call" data-a="call" data-id="' + c.id + '">' + phone + (c.calledAt ? 'Call ' + esc(who) + ' again' : 'Call ' + esc(who)) + '</button><span class="sm">' + esc(c.contact) + ', speaks ' + esc(c.lang) + (c.calledAt ? ' · call placed at ' + hm(c.calledAt) + '. Record what you heard below.' : '') + '</span></div>' +
       '<label class="fld">Exact place<input id="vplace" type="text" value="' + esc(c.exact) + '"></label>' +
       '<div class="btns"><button class="btn go" data-a="verify" data-o="confirmed" data-id="' + c.id + '">Confirmed</button><button class="btn imm" data-a="verify" data-o="up" data-id="' + c.id + '">Worse than reported</button>' +
       '<button class="btn ghost" data-a="verify" data-o="down" data-id="' + c.id + '">Less serious</button><button class="btn no" data-a="verify" data-o="fake" data-id="' + c.id + '">Not genuine</button></div></div>';
@@ -773,6 +775,7 @@
         break;
       case 'newcase': addNewCase(); break;
       case 'repeat': repeatCall(); break;
+      case 'call': var cc = byId(id); if (cc) { cc.calledAt = S.t; ev(cc, 'Responder placed a call to ' + cc.name + ' on ' + cc.contact + '.', true); toast('Calling ' + (cc.name === 'Not left' ? 'the caller' : cc.name) + ' on ' + cc.contact + '. This is a simulated call: record what you heard below.', 'good'); } break;
       case 'voice': ui.voice[id] = !ui.voice[id]; break;
       case 'verify': verify(id, b.getAttribute('data-o'), (document.getElementById('vplace') || { value: '' }).value.trim()); break;
       case 'pause': S.running = !S.running; break;

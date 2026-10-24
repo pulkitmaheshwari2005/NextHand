@@ -192,6 +192,9 @@ ol, ul { margin: 0; }
 .goany { margin: 10px 0 0; padding: 8px 12px; border-radius: 8px; background: var(--imm-soft); border-left: 6px solid var(--imm); }
 .strike { color: var(--imm); }
 .zone.verify { background: #fff; border-color: var(--blue); }
+.callrow { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; margin: 10px 0 2px; }
+.btn.call { display: inline-flex; gap: 8px; align-items: center; background: var(--blue); color: #fff; }
+.btn.call:hover { background: var(--blue-d); }
 .map { margin-top: 14px; }
 .map svg { display: block; width: 100%; height: auto; border: 2px solid var(--line); border-radius: 10px; }
 .map h4 { margin-bottom: 6px; }
