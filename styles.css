@@ -1,7 +1,6 @@
 /* NextHand prototype. Bold colour, one job per screen.
    Bahnschrift (a signage face that ships with Windows) for headings and numbers, Segoe UI for text. No web fonts: runs offline. */
 :root {
-  color-scheme: light dark;
   --blue: #1E4BDB; --blue-d: #13308F; --blue-l: #E6ECFF;
   --ink: #0F1B4D; --mute: #4F5A7D; --bg: #EEF2FF; --panel: #FFFFFF; --line: #D5DDF5;
   --yel: #FFD21F; --yel-d: #E9B800; --yel-soft: #FFF5C2;
@@ -461,48 +460,6 @@ legend { font: 600 16px var(--sign); padding: 0; margin-bottom: 6px; }
 @media (pointer: coarse) {
   input, textarea, select, .fld input, .fld textarea { font-size: 16px; }
   button, .hero { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
-}
-/* ---------- dark mode: follows the device setting. Light mode above is untouched ---------- */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --blue: #3A66F5; --blue-d: #A9BEFF; --blue-l: #1B2850;
-    --ink: #E8ECFA; --mute: #A4AFD0; --bg: #0B1020; --panel: #151C33; --line: #2B3660;
-    --yel-soft: #302C0F;
-    --imm-soft: #3A1B1F; --urg-soft: #38250F; --del-soft: #0F2F2D; --go-soft: #10301E;
-  }
-  .rail { background: #121C47; }
-  .brand .mark, .hero .hb, .hb-go, .tab.on i, .chip2.s-pending, .dgrid button.warn, .dgrid button[data-a="newcase"] { color: #0F1B4D; }
-  .role.on { background: #E8ECFA; color: #0F1B4D; }
-  .tile.t-blue { background: #1B2B73; border-color: #1B2B73; border-top-color: var(--yel); }
-  .tile .bar { background: rgba(255, 255, 255, .14); }
-  .banner.down { background: #05080F; border: 1px solid var(--line); border-left: 6px solid var(--yel); }
-  .toast { background: #26315C; }
-  .scrim { background: rgba(0, 0, 0, .65); }
-
-  .dlg, .zone.verify, .demobox, .ladder li { background: var(--panel); }
-  .fld input, .fld textarea { background: #0F1530; }
-  .zone.wait, .demobox { border-color: #3A4C8F; }
-  .zone.task { border-color: #2D7A4D; }
-  .stage i { background: var(--panel); border-color: #3A4C8F; }
-  .stage::before { background: #3A4C8F; }
-  .ladder li:not(:last-child)::after { border-top-color: #3A4C8F; }
-  .log li, .units td, .units tr { border-bottom-color: var(--line); }
-
-  .greet p b, .tile.t-bad .v, .strike, .btn.no, .checks li.bad, .ans li.ns .qa, .u-stale .ust { color: #FF8A80; }
-  .btn.no { background: transparent; border-color: #FF8A80; }
-  .btn.ghost { background: transparent; color: #A9BEFF; border-color: #4C7DFF; }
-  .tile.t-ok .v, .okline, .walk li.ok span, .u-free .ust { color: #4ADE80; }
-  .u-waiting .ust { color: #FFA94D; }
-  .rec.ok { color: #86EFAC; }
-  .rec.bad { color: #FFB4AD; }
-  @media (hover: hover) { .btn.call:hover { background: #2F58E0; } }
-
-  .mp-bg { fill: #1B2850; }
-  .mp-road { stroke: #2E3D78; }
-  .mp-line { stroke: #3A4C8F; }
-  .mp-route { stroke: #7FA2FF; }
-  .mp-unit { stroke: #151C33; }
-  .mp-t { fill: #E8ECFA; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
