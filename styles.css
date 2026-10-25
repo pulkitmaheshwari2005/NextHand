@@ -1,6 +1,7 @@
 /* NextHand prototype. Bold colour, one job per screen.
    Bahnschrift (a signage face that ships with Windows) for headings and numbers, Segoe UI for text. No web fonts: runs offline. */
 :root {
+  color-scheme: only light;
   --blue: #1E4BDB; --blue-d: #13308F; --blue-l: #E6ECFF;
   --ink: #0F1B4D; --mute: #4F5A7D; --bg: #EEF2FF; --panel: #FFFFFF; --line: #D5DDF5;
   --yel: #FFD21F; --yel-d: #E9B800; --yel-soft: #FFF5C2;
